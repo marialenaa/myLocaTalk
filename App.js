@@ -1,21 +1,32 @@
-import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack'
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+
+import LoginScreen from './screens/loginScreen';
+import MapScreen from './screens/mapScreen';
+import ChatScreen from './screens/chatScreen';
+
+const StackNavigator = createStackNavigator()
+const BottomNavigator  = createBottomTabNavigator()
+
+function TabBottomMap(){
+  return(
+      <BottomNavigator.Navigator headerMode={'none'}>
+            <BottomNavigator.Screen name='map' component={MapScreen} />
+            <BottomNavigator.Screen name='chat' component={ChatScreen} />
+      </BottomNavigator.Navigator>  
+)
+}
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+       <StackNavigator.Navigator>
+          <StackNavigator.Screen name='login' component={LoginScreen} />
+          <StackNavigator.Screen name='map' component={TabBottomMap} />
+      </StackNavigator.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
