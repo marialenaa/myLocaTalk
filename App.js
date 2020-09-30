@@ -4,17 +4,21 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons'; 
+import { Provider } from 'react-redux';
+import { createStore, combineReducers } from 'redux';
+import user from './reducers/user'
 
 import LoginScreen from './screens/loginScreen';
 import MapScreen from './screens/mapScreen';
 import ChatScreen from './screens/chatScreen';
 
-const StackNavigator = createStackNavigator()
+const Stack  = createStackNavigator()
 const BottomNavigator  = createBottomTabNavigator()
     
- 
+const store = createStore(combineReducers({user}),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 function TabBottomMap(){
+  
   return(
       <BottomNavigator.Navigator screenOptions={({route}) =>({
         tabBarIcon: ({color, size, focused}) => {
@@ -36,26 +40,27 @@ function TabBottomMap(){
       inactiveTintColor: '#ff938a'
     }} >
         <BottomNavigator.Screen name='map' component={MapScreen} />
-        <BottomNavigator.Screen name='chat' component={ChatScreen} />
+        <BottomNavigator.Screen name='chat' component={ChatScreen} headerMode='none' />
         </BottomNavigator.Navigator>  
 )
 }
 
 export default function App() {
+
   return (
+    <Provider store={store}>
+
     <NavigationContainer>
-       <StackNavigator.Navigator>
-          <StackNavigator.Screen 
+       <Stack.Navigator>
+          <Stack.Screen 
           options={{
               title: 'Welcome to LocaTalk World'
             }}
           name='login' component={LoginScreen} />
-          <StackNavigator.Screen
-          options={{
-            title: 'My Map'
-          }} 
+          <Stack.Screen
           name='map' component={TabBottomMap} />
-      </StackNavigator.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 }
