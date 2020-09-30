@@ -1,20 +1,31 @@
-import React , {useState} from 'react';
-import { View,  StyleSheet, ImageBackground } from 'react-native';
-import { Input, Icon ,Button} from 'react-native-elements';
+import React, {useState} from 'react';
+import {StyleSheet, ImageBackground, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { Input, Icon ,Button, Text} from 'react-native-elements';
+import {connect} from 'react-redux';
 
-export default function LoginScreen({navigation}){
-    
-  const [loginName, setLoginName] = useState()
+function LoginScreen({navigation, userSave}){
+  const [loginName, setLoginName] = useState('')
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const handleGo = () => {
-    setLoginName('')
-    navigation.navigate('map')
+    if(loginName != ''){
+      console.log(loginName)
+      navigation.navigate('map')
+      userSave(loginName)
+      setLoginName('')
+    } else {
+      setErrorMsg(<Text>Entrez un speudo</Text>)
+    }
   }
 
+  const handleChangeText = (value) => {
+    setErrorMsg(null)
+    setLoginName(value)
+  }
     return(
-      <View  style={styles.container}>
-           <ImageBackground source={require('../assets/loginBub.png')} style={styles.image}>
-              
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+           <ImageBackground style={styles.container} source={require('../assets/loginBub.png')} style={styles.image}>
+              {errorMsg}
                 <Input 
                   containerStyle={
                     {width:'60%',
@@ -22,14 +33,15 @@ export default function LoginScreen({navigation}){
                     }}
                   placeholder='Username'
                   placeholderTextColor='#f77b07'
-                  fontSize='27px'
-                  onChangeText={(value) => setLoginName(value)}
+                  fontSize={27}
+                  onFocus={() => setErrorMsg(null)}
+                  onChangeText={(value) => handleChangeText(value) }
                   value={loginName}
                   leftIcon={
                     <Icon
                      type='font-awesome'
                      name='user' 
-                     size='30'
+                     size={30}
                      color='#f77b07'
                     />
                   }
@@ -42,27 +54,36 @@ export default function LoginScreen({navigation}){
                       titleStyle={{
                         fontWeight: "bold",
                         color:'#f77b07',
-                        fontSize:'25px'    
+                        fontSize:25    
                       }}
                       buttonStyle={{
                         borderColor: "#b27237", borderWidth:1
                       }}
                       />
             </ImageBackground>
-      </View>
+       </TouchableWithoutFeedback>
     )
+  }
+
+  function mapDispatchToProps(dispatch){
+    return {
+      userSave: function(loginName){
+        dispatch( {type: 'userSaving',
+        user : loginName } )
+      }
+    }
   }
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       flexDirection: "column",
-      justifyContent:'space-evenly'
     },
     image: {
       flex: 1,
+      paddingTop: 200,
       resizeMode: 'cover',
-      justifyContent: 'space-around',
+      justifyContent: 'flex-start',
       alignItems: 'center',
     }, 
     input:  {
@@ -71,4 +92,8 @@ export default function LoginScreen({navigation}){
     },
     
   });
-  
+ 
+  export default connect(
+    null,
+    mapDispatchToProps
+  )(LoginScreen)
