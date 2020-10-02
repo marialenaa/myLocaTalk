@@ -11,11 +11,13 @@ import user from './reducers/user'
 import LoginScreen from './screens/loginScreen';
 import MapScreen from './screens/mapScreen';
 import ChatScreen from './screens/chatScreen';
+import PinsScreen from './screens/pinsScreen';
+import listPOI from './reducers/POI'
 
 const Stack  = createStackNavigator()
 const BottomNavigator  = createBottomTabNavigator()
     
-const store = createStore(combineReducers({user}),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+const store = createStore(combineReducers({user, listPOI}),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 function TabBottomMap(){
   
@@ -31,6 +33,10 @@ function TabBottomMap(){
           iconName = focused
           ? 'md-text'
           : 'ios-chatboxes'
+        } else if(route.name === 'pins'){
+          iconName = focused
+          ? 'ios-list'
+          : 'ios-pin'
         }
         return <Ionicons name={iconName} size={size} color={color} />
       },
@@ -41,6 +47,7 @@ function TabBottomMap(){
     }} >
         <BottomNavigator.Screen name='map' component={MapScreen} />
         <BottomNavigator.Screen name='chat' component={ChatScreen} headerMode='none' />
+        <BottomNavigator.Screen name='pins' component={PinsScreen} headerMode='none' />
         </BottomNavigator.Navigator>  
 )
 }
