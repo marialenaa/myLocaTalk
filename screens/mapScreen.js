@@ -7,7 +7,9 @@ import 'react-native-gesture-handler';
 import MapView, { PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
 
 import { StyleSheet,View, Keyboard } from 'react-native';
-import { Button, Icon, Overlay, Input, Text   }  from 'react-native-elements';
+import { Button, Icon, Text }  from 'react-native-elements';
+
+import OverlayPin from '../components/overlayPin'
 
 function MapScreen(props){
   const [errorMsg, setErrorMsg] = useState(null);
@@ -15,19 +17,25 @@ function MapScreen(props){
   const [titlePOI, setTitlePOI] = useState(null)
   const [descPOI, setDescPOI] = useState(null)
   const [coords, setCoords] = useState(0)
+
   const [waittingMarker, setWaittingMarker] = useState(false)
-  // const [isVisible, setIsVisible] = useState(false);
+
+  // const [lon, setLon] = useState(null)
+  // const [lat, setLat] = useState(null)
+  const [loca, setLoca] = useState({})
+
 
   useEffect(() => {
     async function askPermission(){
       const {status} = await Permissions.askAsync(Permissions.LOCATION)
       // console.log('status', {status})
       if(status === 'granted'){
-       Location.watchPositionAsync({distanceInterval: 10},
+       await Location.watchPositionAsync({distanceInterval: 30},
           (location) => {
-            props.addPOIRedux({title:'Ma position', desc:'', coordinate:{latitude:location.coords.latitude, longitude: location.coords.longitude}} ) 
+            // setLoca(location.coords)            
+            // setLon(location.coords.longitude)
+            // setLat(location.coords.latitude)
           })
-            // console.log(location);
       } else {
         setErrorMsg(<Text style={{textAlign:'center', backgroundColor:'#fcb1ab'}}>Location permission not granted</Text>)
       }
@@ -36,39 +44,40 @@ function MapScreen(props){
   }, [])
 
   const Region = {
-    latitude: 48.866667,
-    longitude: 2.333333,
+    latitude:  48.866667,
+    longitude:  2.333333,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.2,
   }
-    // console.log('REGIO++++++',Region)
-    let title, title2
+
+  let title
     if(waittingMarker){
       title="Selectionnez sur la Map   "
-      title2="..."
     }else{
       title="Pin personnalisé   "
-      title2="Mes Pins"
     }
-  const handleOverlay = (coord) =>{
-    if(waittingMarker){
-      setOverlayVisible(!isOverlayVisible)
-      setCoords(coord)
-      setDescPOI(null)
-      setTitlePOI(null)
-    }else{
-      console.log('ELSEEEE')
-    }
-  }
 
-  const handleMarkerSelec = () => {
-    setWaittingMarker(true)
-  }
+    const handleMarkerSelec = () => {
+      setWaittingMarker(true)
+    }
+
+    const handleOverlay = (lat, lon) =>{
+      console.log('lonlat',lat, lon)
+      if(waittingMarker){
+        console.log('zofnzfzf')
+        setOverlayVisible(!isOverlayVisible)
+        setCoords({lat:lat, lon:lon})
+        setDescPOI(null)
+        setTitlePOI(null)
+      }else{
+        console.log('ELSEEEE')
+      }
+    }
 
   const handleAjout = () => {
     setWaittingMarker(false)
     setOverlayVisible(!isOverlayVisible)
-    props.addPOIRedux({title:titlePOI, desc:descPOI, coordinate:coords})
+    props.addPOIRedux({title:titlePOI, desc:descPOI, lat:coords.lat, lon:coords.lon})
   }
 
   let disabledAjout = false
@@ -81,21 +90,23 @@ function MapScreen(props){
       <View style={styles.container}>
             {errorMsg}
             <MapView  
-            showsMyLocationButton={true}
-            zoomEnabled={true}
-            scrollEnabled={true}
-            showsScale={true}
-            style={ {flex: 1}}
-            initialRegion={Region}
-            onPress={e => handleOverlay(e.nativeEvent.coordinate)}
+                showsUserLocation={true}
+                showsMyLocationButton={true}
+                onUserLocationChange={e => setLoca(e.nativeEvent.coordinate)}
+                zoomEnabled={true}
+                scrollEnabled={true}
+                showsScale={true}
+                style={ {flex: 1}}
+                region={Region}
+                onPress={e => handleOverlay(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)}
             >
                {props.listPOI.map((marker, i) => (
                   <Marker
                     draggable
                     provider={PROVIDER_GOOGLE}
                     key={i}
-                    coordinate={marker.coordinate}
-                    pinColor={'pink'}
+                    coordinate={{latitude:marker.lat, longitude:marker.lon}}
+                    pinColor={'#fc7d74'}
                   >
                        <Callout>
                          <View>
@@ -119,7 +130,7 @@ function MapScreen(props){
                 titleStyle={{
                   fontWeight: "bold",
                   color: waittingMarker? '#9da4ad' :  '#fcd476',
-                  fontSize: 20,
+                  fontSize:20 ,
                 }}
                 icon={
                   <Icon
@@ -137,76 +148,28 @@ function MapScreen(props){
                     borderColor:'#ffe093', 
                 }}
                 />
-                 {/* <Button 
-                disabled={waittingMarker}
-                title={title2}
-                onPress={() => setIsVisible(true)}
-                type='outline' 
-                titleStyle={{
-                  fontWeight: "bold",
-                  color:waittingMarker? '#9da4ad' :  '#fcd476',
-                  fontSize:20,
-                }}
-                buttonStyle={{
-                    justifyContent:'center', 
-                    backgroundColor: waittingMarker? '#c5e0db' :  '#42c6ae' , 
-                    borderWidth:2, 
-                    borderColor:'#ffe093', 
-                }}
-                /> */}
-                 <Overlay overlayStyle={{ width: '85%', textAlign:'center'}} isVisible={isOverlayVisible} onBackdropPress={() => Keyboard.dismiss()}>
-                   <View >
-                   <Button 
-                      title="Go "
-                      onPress={handleAjout}
-                      type='outline' 
-                      titleStyle={{
-                        fontWeight: "bold",
-                        color:'#ea3a3a',
-                        fontSize: disabledAjout? 30 : 20,
-                      }}
-                      disabled={!disabledAjout}
-                      icon={
-                        <Icon
-                          type='font-awesome'
-                          name="map-marker"
-                          size={disabledAjout ? 30: 20}
-                          color={disabledAjout ? "#ea3a3a" : '#abb0b5'}
-                        />
-                      }
-                      iconRight
-                      buttonStyle={{borderColor: "#42c6ae", borderWidth:1 , marginBottom:20}}
-                    />
-                   <Input 
-                      label='Titre'
-                      placeholderTextColor='#fcb1ab'
-                      placeholder="J'écris.."
-                      value={titlePOI}
-                      onChangeText={(value) => setTitlePOI(value)}
-                      style={styles.input}
-                    />
-                    <Input 
-                      label='Description'
-                      placeholderTextColor='#fcb1ab'
-                      placeholder="J'écris.."
-                      value={descPOI}
-                      onChangeText={(value) => setDescPOI(value)}
-                      style={styles.input}
-                    />
-                 
-                    <Button 
-                      title="Annuler  "
-                      onPress={() => {setWaittingMarker(false) , setOverlayVisible(!isOverlayVisible)}}
-                      type='outline' 
-                      titleStyle={{
-                        fontWeight: "bold",
-                        color:'#ea3a3a',
-                        fontSize:15,
-                      }}
-                      buttonStyle={styles.butonStyle}
-                    />
-                   </View>
-                  </Overlay>
+                <OverlayPin 
+                    onPressKeyBord={() => Keyboard.dismiss()}
+                    isOverlayVisible={isOverlayVisible}
+                    onPressBtnAnnuler={() => {setWaittingMarker(false) , setOverlayVisible(!isOverlayVisible)}}
+                    stylesInput={styles.input}
+                    styleBtn={styles.butonStyle}
+                    onChangeTextBtnDesc={(value) => setDescPOI(value)}
+                    onChangeTextBtntitle={(value) => setTitlePOI(value)}
+                    valueDesc={descPOI}
+                    valueTitle={titlePOI}
+                    onPressBtnGo={handleAjout}
+                    disabledBtnGo={!disabledAjout}
+                    sizeIconGo={disabledAjout ? 30: 20}
+                    colorIconGo={disabledAjout ? "#ea3a3a" : '#abb0b5'}
+                    titleStyleBtnGo={{
+                      fontWeight: "bold",
+                      color:'#ea3a3a',
+                      fontSize: disabledAjout? 30 : 20,
+                    }}
+                    buttonStyleBtnGo={{borderColor: "#42c6ae", borderWidth:1 , marginBottom:20}}
+
+                />
     </View>
 
     )

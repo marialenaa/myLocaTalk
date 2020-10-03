@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Card, Button, Icon, Text   }  from 'react-native-elements';
-import { View, Image } from 'react-native';
+import { Button, Icon, Text, ListItem, Image }  from 'react-native-elements';
+import { View } from 'react-native';
 
 
 function PinsScreen(props){
@@ -11,50 +11,53 @@ function PinsScreen(props){
     props.deletePOIRedux(title)
   }
 
-    return(
-        <Card >
-        <Card.Title >Ma Pins List</Card.Title>
-        <Card.Divider/>
-        
-        {props.listPOI.length === 0 ? <Text>LISTE VIDE</Text> : props.listPOI.map((pin, i) => (
-              <View key={i} >
-                <Image
-                    // style={styles.image}
-                    resizeMode="cover"
-                    source={{uri : '../assets/ii.png' }}
-                  />
-                  <Text><Icon  type='font-awesome' name="map-marker" />{pin.title}</Text>
-                   <Text>{pin.desc}</Text>
-                   <Button
-                      onPress={()=>handleRemovePin(pin.title)}
-                      icon={
-                        <Icon
-                        type='font-awesome'
-                          name="minus-square"
-                          size={15}
-                          color="#ea3a3a"
-                        />
-                        }
-                        iconRight
-                        type="clear"
-                        title="Button"
-                        titleStyle={{color:'#ea3a3a'}}
-                      />
-                      <Card.Divider/>
+  
 
-              </View>
-              
+    return(
+      <View>
+        <Text>Ma Pins List</Text>
+         {props.listPOI.length === 0 ? <Text>LISTE VIDE</Text> 
+         : props.listPOI.map((pin, i) => (
+          <ListItem key={i}>
+            <ListItem.Content  >
+              <ListItem.Title ><Icon  type='font-awesome' name="map-marker" /> {pin.title} : {pin.desc}</ListItem.Title>
+              <ListItem.Subtitle>{pin.lat}__{pin.lon}</ListItem.Subtitle>
+                <View>
+                <Image
+                      // style={styles.image}
+                      resizeMode="cover"
+                      source={{uri : '../assets/pin.png' }}
+                    />
+                    <Button
+                            onPress={()=>handleRemovePin(pin.title)}
+                            icon={
+                              <Icon
+                              type='font-awesome'
+                                name="minus-square"
+                                size={25}
+                                color="#ea3a3a"
+                              />
+                              }
+                              iconRight
+                              type="clear"
+                              title=""
+                              titleStyle={{color:'#ea3a3a'}}
+                            />
+                </View>
+            </ListItem.Content>
+          </ListItem>
             ))
           }
-        </Card>
+      </View>
+       
     )
 }
+
 function mapStateToProps(state){
   return {
     listPOI : state.listPOI
     }
 }
-
 
 function mapDispatchToProps(dispatch){
   return {
@@ -65,6 +68,7 @@ function mapDispatchToProps(dispatch){
     }
   }
 }
+
 
 export default connect(
   mapStateToProps,
