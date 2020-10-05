@@ -3,15 +3,15 @@ import {StyleSheet, ImageBackground, Keyboard, TouchableWithoutFeedback } from '
 import { Input, Icon ,Button, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 
-function LoginScreen({navigation, userSave}){
+function LoginScreen({navigation,userSave}){
   const [loginName, setLoginName] = useState('')
   const [errorMsg, setErrorMsg] = useState(null);
 
   const handleGo = () => {
     if(loginName != ''){
-      console.log(loginName)
-      navigation.navigate('map')
+      console.log('LOGIN',loginName)
       userSave(loginName)
+      navigation.navigate('map')
       setLoginName('')
     } else {
       setErrorMsg(<Text>Entrez un speudo</Text>)
@@ -22,7 +22,8 @@ function LoginScreen({navigation, userSave}){
     setErrorMsg(null)
     setLoginName(value)
   }
-    return(
+
+  return(
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
            <ImageBackground style={styles.container} source={require('../assets/loginBub.png')} style={styles.image}>
               {errorMsg}
@@ -65,15 +66,6 @@ function LoginScreen({navigation, userSave}){
     )
   }
 
-  function mapDispatchToProps(dispatch){
-    return {
-      userSave: function(loginName){
-        dispatch( {type: 'userSaving',
-        user : loginName } )
-      }
-    }
-  }
-
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -92,8 +84,17 @@ function LoginScreen({navigation, userSave}){
     },
     
   });
+
+  function mapDispatchToProps(dispatch){
+    return {
+      userSave: function(loginName){
+        dispatch( {type: 'userSaving',
+        user : loginName } )
+      }
+    }
+  }
  
   export default connect(
     null,
-    mapDispatchToProps
+    mapDispatchToProps,
   )(LoginScreen)
