@@ -2,55 +2,20 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons'; 
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
-import user from './reducers/user'
 
 import LoginScreen from './screens/loginScreen';
-import MapScreen from './screens/mapScreen';
-import ChatScreen from './screens/chatScreen';
-import PinsScreen from './screens/pinsScreen';
 import listPOI from './reducers/POI'
+import user from './reducers/user'
+import messagerie from './reducers/mess'
+import notif from './reducers/notif'
+
+import TabBottomMap from './components/layout'
 
 const Stack  = createStackNavigator()
-const BottomNavigator  = createBottomTabNavigator()
     
-const store = createStore(combineReducers({user, listPOI}),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
-
-function TabBottomMap(){
-  
-  return(
-      <BottomNavigator.Navigator screenOptions={({route}) =>({
-        tabBarIcon: ({color, size, focused}) => {
-        let iconName;
-        if(route.name === 'map'){
-          iconName = focused
-          ? 'md-map'
-          : 'ios-pin'
-        }else if(route.name === 'chat'){
-          iconName = focused
-          ? 'md-text'
-          : 'ios-chatboxes'
-        } else if(route.name === 'pins'){
-          iconName = focused
-          ? 'ios-list'
-          : 'ios-pin'
-        }
-        return <Ionicons name={iconName} size={size} color={color} />
-      },
-    })}
-    tabBarOptions={{
-        activeTintColor: '#c4133c',
-      inactiveTintColor: '#ff938a'
-    }} >
-        <BottomNavigator.Screen name='map' component={MapScreen} />
-        <BottomNavigator.Screen name='chat' component={ChatScreen} headerMode='none' />
-        <BottomNavigator.Screen name='pins' component={PinsScreen} headerMode='none' />
-        </BottomNavigator.Navigator>  
-)
-}
+const store = createStore(combineReducers({user, listPOI, messagerie, notif}),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 export default function App() {
 
@@ -59,13 +24,8 @@ export default function App() {
 
     <NavigationContainer>
        <Stack.Navigator>
-          <Stack.Screen 
-          options={{
-              title: 'Welcome to LocaTalk World'
-            }}
-          name='login' component={LoginScreen} />
-          <Stack.Screen
-          name='map' component={TabBottomMap} />
+          <Stack.Screen options={{ title: 'Welcome to LocaTalk World'}} name='login' component={LoginScreen} />
+          <Stack.Screen name='map' component={TabBottomMap} />
       </Stack.Navigator>
     </NavigationContainer>
     </Provider>

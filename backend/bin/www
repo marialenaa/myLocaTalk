@@ -23,9 +23,15 @@ var server = http.createServer(app);
 
 var io = require('socket.io')(server);
 
+//ECOUTE FRONT
 io.on('connection', function(socket){
+
+//RECEPTION DU FRONT
   socket.on('sendMessage', function(newMessage){
-    console.log('sendMessToAll',newMessage)
+      // console.log('sendMessToAll',newMessage)
+
+//ENVOI DU BACK VERS FRONT
+    socket.emit('sendMessage', newMessage)
     socket.broadcast.emit('sendMessageToAll', newMessage)
   }
   )

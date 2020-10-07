@@ -6,7 +6,7 @@ import * as Permissions from 'expo-permissions';
 import 'react-native-gesture-handler';
 import MapView, { PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps';
 
-import { StyleSheet,View, Keyboard } from 'react-native';
+import { StyleSheet,View, Keyboard, Modal , TouchableHighlight} from 'react-native';
 import { Button, Icon, Text }  from 'react-native-elements';
 
 import OverlayPin from '../components/overlayPin'
@@ -17,18 +17,15 @@ function MapScreen(props){
   const [titlePOI, setTitlePOI] = useState(null)
   const [descPOI, setDescPOI] = useState(null)
   const [coords, setCoords] = useState(0)
-
   const [waittingMarker, setWaittingMarker] = useState(false)
 
   // const [lon, setLon] = useState(null)
   // const [lat, setLat] = useState(null)
   const [loca, setLoca] = useState({})
 
-
   useEffect(() => {
     async function askPermission(){
       const {status} = await Permissions.askAsync(Permissions.LOCATION)
-      // console.log('status', {status})
       if(status === 'granted'){
        await Location.watchPositionAsync({distanceInterval: 30},
           (location) => {
@@ -86,7 +83,6 @@ function MapScreen(props){
   }
 
     return (
-
       <View style={styles.container}>
             {errorMsg}
             <MapView  
@@ -168,10 +164,8 @@ function MapScreen(props){
                       fontSize: disabledAjout? 30 : 20,
                     }}
                     buttonStyleBtnGo={{borderColor: "#42c6ae", borderWidth:1 , marginBottom:20}}
-
                 />
     </View>
-
     )
   }
 
@@ -189,7 +183,7 @@ function MapScreen(props){
       borderColor:'#42c6ae', 
       borderWidth:1, 
       marginBottom:20,
-    }
+    },
   });
 
 function mapDispatchToProps(dispatch){
